@@ -16,6 +16,7 @@ angular.module('myModule', ['resource.watcher']);
   * When a Resource has not been change and save is called it does'n send any requrest.
   * A Resource can rollback to a previous state (cancel logic)
   * The Watcher directive watches for changes on a resource. When the resource is changed, the watcher displays the saver or cancel buttons
+  * Form validation
 
 # Usage
 
