@@ -1,5 +1,5 @@
 {
-    "name": "angularResourceWatcher",
+    "name": "angular-resource-watcher",
     "main": "build/angular-resource-watcher.js",
     "ignore": [
         "**/.*",
