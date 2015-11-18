@@ -104,8 +104,6 @@ rw = angular.module('resource.watcher', ['ngResource'])
 
     class Resource
       
-      build = (object) -> new Resource object
-      
       constructor: (object) ->
         @_state = if @_isExisting(object) then new ExistingResourceState() else new NewResourceState()
         @updateValuesWith new api object
@@ -151,6 +149,8 @@ rw = angular.module('resource.watcher', ['ngResource'])
 
 
     _.assign Resource, api
+
+    build = (object) -> new Resource object
 
     Resource.get = (parameters) ->
       api.get(parameters).$promise.then build
