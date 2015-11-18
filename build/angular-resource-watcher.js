@@ -1,4 +1,4 @@
-/* angular-resource-watcher - v1.2.0 - 2015-11-17 */
+/* angular-resource-watcher - v0.1 - 2015-11-18 */
 'use strict';
 var rw,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
@@ -173,21 +173,11 @@ rw = angular.module('resource.watcher', ['ngResource']).factory('resource', func
       id: '@id'
     }, parameters);
     api = $resource(url, defaultParams, defaultActions);
-    return Resource = (function() {
+    Resource = (function() {
       var build;
 
       build = function(object) {
         return new Resource(object);
-      };
-
-      Resource.get = function(parameters) {
-        return api.get(parameters).$promise.then(build);
-      };
-
-      Resource.query = function(parameters) {
-        return api.query(parameters).$promise.then(function(arr) {
-          return arr.map(build);
-        });
       };
 
       function Resource(object) {
@@ -204,7 +194,7 @@ rw = angular.module('resource.watcher', ['ngResource']).factory('resource', func
         this["delete"] = __bind(this["delete"], this);
         this.save = __bind(this.save, this);
         this._state = this._isExisting(object) ? new ExistingResourceState() : new NewResourceState();
-        this.updateValuesWith(object);
+        this.updateValuesWith(new api(object));
       }
 
       Resource.prototype._isExisting = function(properties) {
@@ -250,7 +240,7 @@ rw = angular.module('resource.watcher', ['ngResource']).factory('resource', func
       };
 
       Resource.prototype.updateValuesWith = function(object) {
-        return _.assign(this, object);
+        return _.assign(_.assign(this, object), Object.getPrototypeOf(object));
       };
 
       Resource.prototype.sendPost = function(options) {
@@ -268,6 +258,16 @@ rw = angular.module('resource.watcher', ['ngResource']).factory('resource', func
       return Resource;
 
     })();
+    _.assign(Resource, api);
+    Resource.get = function(parameters) {
+      return api.get(parameters).$promise.then(build);
+    };
+    Resource.query = function(parameters) {
+      return api.query(parameters).$promise.then(function(arr) {
+        return arr.map(build);
+      });
+    };
+    return Resource;
   };
 });
 

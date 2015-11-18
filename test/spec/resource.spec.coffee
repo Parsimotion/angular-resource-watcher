@@ -7,7 +7,24 @@ describe 'resource', ->
   beforeEach ->
     inject (resource, $httpBackend) ->
       httpBackend = $httpBackend
-      class Comment extends resource '/posts/:post/comments/:id'
+      class Comment extends resource '/posts/:post/comments/:id', {},
+        ban:
+          url: '/posts/:post/comments/:id/ban'
+          method: 'POST'
+
+  it "can have custom actions as class methods", ->
+    Comment.ban { post: 111, id: 1234 }, {}
+    httpBackend.expectPOST('/posts/111/comments/1234/ban').respond 200
+    httpBackend.flush()
+
+  it "can have custom actions as instance methods", ->
+    comment = new Comment
+      id: 1234
+      message: "this is a comment"
+      author: "John"
+    comment.$ban {post: 111 }
+    httpBackend.expectPOST('/posts/111/comments/1234/ban').respond 200
+    httpBackend.flush()
 
   it "should be new when it is instantiated with a json without id", ->
     comment = new Comment
