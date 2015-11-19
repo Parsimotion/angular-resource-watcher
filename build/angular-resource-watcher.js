@@ -1,4 +1,4 @@
-/* angular-resource-watcher - v1.2.0 - 2015-11-17 */
+/* angular-resource-watcher - v0.0.1 - 2015-11-18 */
 'use strict';
 var rw,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
@@ -272,61 +272,233 @@ rw = angular.module('resource.watcher', ['ngResource']).factory('resource', func
 });
 
 'use strict';
+var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+
+rw.factory('CollectionWatcher', function(ResourceWatcher, $q) {
+  var CollectionWatcher;
+  return CollectionWatcher = (function() {
+    function CollectionWatcher(scope, collection) {
+      this.scope = scope;
+      this.collection = collection;
+      this._getOrCreateResourceWatcher = __bind(this._getOrCreateResourceWatcher, this);
+      this._watchResource = __bind(this._watchResource, this);
+      this._saveResource = __bind(this._saveResource, this);
+      this._rollbackDirtyResources = __bind(this._rollbackDirtyResources, this);
+      this._removeNewResources = __bind(this._removeNewResources, this);
+      this._createResourceWatcher = __bind(this._createResourceWatcher, this);
+      this.isNew = __bind(this.isNew, this);
+      this.isDirty = __bind(this.isDirty, this);
+      this.save = __bind(this.save, this);
+      this.cancel = __bind(this.cancel, this);
+      this.resourceWatchers = this.collection.map((function(_this) {
+        return function(it) {
+          return _this._createResourceWatcher(it);
+        };
+      })(this));
+    }
+
+    CollectionWatcher.prototype.cancel = function() {
+      this._removeNewResources();
+      return this._rollbackDirtyResources();
+    };
+
+    CollectionWatcher.prototype.save = function(options) {
+      var savePromises;
+      savePromises = this.collection.map(_.partial(this._saveResource, options));
+      return $q.all(savePromises);
+    };
+
+    CollectionWatcher.prototype.isDirty = function() {
+      return _.some(this.collection, (function(_this) {
+        return function(it) {
+          return it.isDirty();
+        };
+      })(this));
+    };
+
+    CollectionWatcher.prototype.isNew = function() {
+      return _.some(this.collection, (function(_this) {
+        return function(it) {
+          return it.isNew();
+        };
+      })(this));
+    };
+
+    CollectionWatcher.prototype._createResourceWatcher = function(resource) {
+      return new ResourceWatcher(this.scope, resource);
+    };
+
+    CollectionWatcher.prototype._removeNewResources = function() {
+      var newResources;
+      newResources = this.collection.filter(function(it) {
+        return it.isNew();
+      });
+      return newResources.forEach(_.partial(_.remove, this.collection));
+    };
+
+    CollectionWatcher.prototype._rollbackDirtyResources = function() {
+      var dirtyWatchers;
+      dirtyWatchers = _.filter(this.resourceWatchers, function(it) {
+        return it.isDirty();
+      });
+      return this._getDirtyWatchers().forEach(function(it) {
+        return it.cancel();
+      });
+    };
+
+    CollectionWatcher.prototype._saveResource = function(options, resource) {
+      return resource.save(options).then((function(_this) {
+        return function() {
+          return _this._watchResource(resource);
+        };
+      })(this));
+    };
+
+    CollectionWatcher.prototype._watchResource = function(resource) {
+      return this._getOrCreateResourceWatcher(resource).watch();
+    };
+
+    CollectionWatcher.prototype._getOrCreateResourceWatcher = function(resource) {
+      var resourceWatcher;
+      resourceWatcher = _.find(this.resourceWatchers, function(it) {
+        return it.resource === resource;
+      });
+      if (!resourceWatcher) {
+        resourceWatcher = this._createResourceWatcher(resource);
+        this.resourceWatchers.push(resourceWatcher);
+      }
+      return resourceWatcher;
+    };
+
+    return CollectionWatcher;
+
+  })();
+});
+
+'use strict';
+var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+
+rw.factory('ResourceWatcher', function() {
+  var ResourceWatcher;
+  return ResourceWatcher = (function() {
+    function ResourceWatcher(scope, watchedResource) {
+      this.scope = scope;
+      this.watchedResource = watchedResource;
+      this.isNew = __bind(this.isNew, this);
+      this.isDirty = __bind(this.isDirty, this);
+      this.save = __bind(this.save, this);
+      this.cancel = __bind(this.cancel, this);
+      this.watch = __bind(this.watch, this);
+      this.watch();
+    }
+
+    ResourceWatcher.prototype.watch = function() {
+      var unsubscribe;
+      return unsubscribe = this.scope.$watch(((function(_this) {
+        return function() {
+          return _this.watchedResource;
+        };
+      })(this)), (function(_this) {
+        return function(newValue, oldValue) {
+          if (newValue !== oldValue) {
+            _this.watchedResource.setAsDirty(oldValue);
+            return unsubscribe();
+          }
+        };
+      })(this), true);
+    };
+
+    ResourceWatcher.prototype.cancel = function() {
+      this.watchedResource.rollback();
+      return this.watch();
+    };
+
+    ResourceWatcher.prototype.save = function(options) {
+      return this.watchedResource.save(options).then(this.watch);
+    };
+
+    ResourceWatcher.prototype.isDirty = function() {
+      return this.watchedResource.isDirty();
+    };
+
+    ResourceWatcher.prototype.isNew = function() {
+      return this.watchedResource.isNew();
+    };
+
+    return ResourceWatcher;
+
+  })();
+});
+
+'use strict';
 rw.constant("watcherConfig", {
   save: 'Guardar',
   cancel: 'Cancelar'
 });
 
-rw.directive("watcher", function(watcherConfig) {
+rw.directive("watcher", function(watcherConfig, ResourceWatcher, CollectionWatcher, $parse) {
   var template;
-  template = "<div ng-show=\"isDirty()\">\n  <input type=\"submit\" ng-value=\"saveLabel\" class=\"btn btn-primary\"/><a href=\"\" ng-click=\"cancel()\" ng-show=\"cancelVisible()\" class=\"cancel-link\">{{ cancelLabel }}</a>\n</div>";
+  template = "<div ng-show=\"isDirty()\">\n  <input type=\"submit\" ng-value=\"saveLabel\" class=\"btn btn-primary\"/><a href=\"\" ng-click=\"cancel()\" class=\"cancel-link\">{{ cancelLabel }}</a>\n</div>";
   return {
     template: template,
     restrict: 'E',
     replace: true,
-    scope: {
-      resource: "=",
-      onCancelWhenNew: "&"
-    },
-    link: function(scope, formElement, attributes) {
-      var watch;
-      watch = function() {
-        var unsubscribe;
-        return unsubscribe = scope.$watch((function() {
-          return scope.resource;
-        }), function(newValue, oldValue) {
-          if (newValue === oldValue) {
-            return;
-          }
-          if (newValue !== oldValue) {
-            scope.resource.setAsDirty(oldValue);
-            return unsubscribe();
-          }
-        }, true);
+    scope: false,
+    controller: function($scope, $attrs) {
+      this.addWatcher = function(watcher) {
+        return $scope.watcher = watcher;
       };
-      scope.saveLabel = watcherConfig.save;
-      scope.cancelLabel = watcherConfig.cancel;
-      scope.cancel = function() {
-        if (scope.resource.isNew()) {
-          return scope.onCancelWhenNew();
-        } else {
-          scope.resource.rollback();
-          return watch();
-        }
+      $scope.saveLabel = watcherConfig.save;
+      $scope.cancelLabel = watcherConfig.cancel;
+      $scope.cancel = function() {
+        return $scope.watcher.cancel();
       };
-      scope.isDirty = function() {
-        return scope.resource.isDirty();
+      $scope.isDirty = function() {
+        return $scope.watcher.isDirty();
       };
-      scope.isNew = function() {
-        return scope.resource.isNew();
+      $scope.isNew = function() {
+        return $scope.watcher.isNew();
       };
-      scope.cancelVisible = function() {
-        return !scope.isNew() || (attributes.onCancelWhenNew != null);
-      };
-      scope.$on('save', function(e, options) {
-        return scope.resource.save(options).then(watch);
+      return $scope.$on('save', function(e, options) {
+        return $scope.watcher.save(options);
       });
-      return watch();
+    }
+  };
+}).directive("watchResource", function(ResourceWatcher, $parse) {
+  return {
+    restrict: 'A',
+    require: '^watcher',
+    scope: {
+      watchResource: '='
+    },
+    link: function(scope, formElement, attrs, controller) {
+      var resource;
+      resource = $parse(scope.watchResource)(scope);
+      return controller.addWatcher(new ResourceWatcher(scope, resource));
+    }
+  };
+}).directive("watchResourceCollection", function(CollectionWatcher, $parse) {
+  return {
+    restrict: 'A',
+    require: '^watcher',
+    scope: {
+      watchResourceCollection: '='
+    },
+    link: function(scope, formElement, attrs, controller) {
+      var resources;
+      resources = $parse(scope.watchResourceCollection)(scope);
+      return controller.addWatcher(new CollectionWatcher(scope, resources));
+    }
+  };
+}).directive("customWatch", function($parse) {
+  return {
+    restrict: 'A',
+    require: '^watcher',
+    scope: {
+      customWatch: '='
+    },
+    link: function(scope, formElement, attrs, controller) {
+      return controller.addWatcher($parse(scope.customWatch)(scope));
     }
   };
 }).directive("watcherSubmit", function($parse) {
