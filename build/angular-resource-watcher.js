@@ -1,4 +1,4 @@
-/* angular-resource-watcher - v0.0.2 - 2015-11-18 */
+/* angular-resource-watcher - v0.0.2 - 2015-11-19 */
 'use strict';
 var rw,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
@@ -338,7 +338,7 @@ rw.factory('CollectionWatcher', function(ResourceWatcher, $q) {
       dirtyWatchers = _.filter(this.resourceWatchers, function(it) {
         return it.isDirty();
       });
-      return this._getDirtyWatchers().forEach(function(it) {
+      return dirtyWatchers.forEach(function(it) {
         return it.cancel();
       });
     };
@@ -440,7 +440,7 @@ rw.directive("watcher", function(watcherConfig, ResourceWatcher, CollectionWatch
     template: template,
     restrict: 'E',
     replace: true,
-    scope: false,
+    scope: true,
     controller: function($scope, $attrs) {
       this.addWatcher = function(watcher) {
         return $scope.watcher = watcher;
@@ -465,37 +465,31 @@ rw.directive("watcher", function(watcherConfig, ResourceWatcher, CollectionWatch
   return {
     restrict: 'A',
     require: '^watcher',
-    scope: {
-      watchResource: '='
-    },
+    scope: false,
     link: function(scope, formElement, attrs, controller) {
       var resource;
-      resource = $parse(scope.watchResource)(scope);
+      resource = $parse(attrs.watchResource)(scope);
       return controller.addWatcher(new ResourceWatcher(scope, resource));
     }
   };
 }).directive("watchResourceCollection", function(CollectionWatcher, $parse) {
   return {
     restrict: 'A',
+    scope: false,
     require: '^watcher',
-    scope: {
-      watchResourceCollection: '='
-    },
     link: function(scope, formElement, attrs, controller) {
       var resources;
-      resources = $parse(scope.watchResourceCollection)(scope);
+      resources = $parse(attrs.watchResourceCollection)(scope);
       return controller.addWatcher(new CollectionWatcher(scope, resources));
     }
   };
 }).directive("customWatch", function($parse) {
   return {
     restrict: 'A',
+    scope: false,
     require: '^watcher',
-    scope: {
-      customWatch: '='
-    },
     link: function(scope, formElement, attrs, controller) {
-      return controller.addWatcher($parse(scope.customWatch)(scope));
+      return controller.addWatcher($parse(attrs.customWatch)(scope));
     }
   };
 }).directive("watcherSubmit", function($parse) {
