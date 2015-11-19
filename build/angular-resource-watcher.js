@@ -283,6 +283,7 @@ rw.factory('CollectionWatcher', function(ResourceWatcher, $q) {
       this._rollbackDirtyResources = __bind(this._rollbackDirtyResources, this);
       this._removeNewResources = __bind(this._removeNewResources, this);
       this._createResourceWatcher = __bind(this._createResourceWatcher, this);
+      this.createAndAddResourceWatcher = __bind(this.createAndAddResourceWatcher, this);
       this.isNew = __bind(this.isNew, this);
       this.isDirty = __bind(this.isDirty, this);
       this.save = __bind(this.save, this);
@@ -319,6 +320,13 @@ rw.factory('CollectionWatcher', function(ResourceWatcher, $q) {
           return it.isNew();
         };
       })(this));
+    };
+
+    CollectionWatcher.prototype.createAndAddResourceWatcher = function(resource) {
+      var resourceWatcher;
+      resourceWatcher = this._createResourceWatcher(resource);
+      this.resourceWatchers.push(resourceWatcher);
+      return resourceWatcher;
     };
 
     CollectionWatcher.prototype._createResourceWatcher = function(resource) {
@@ -361,8 +369,7 @@ rw.factory('CollectionWatcher', function(ResourceWatcher, $q) {
         return it.resource === resource;
       });
       if (!resourceWatcher) {
-        resourceWatcher = this._createResourceWatcher(resource);
-        this.resourceWatchers.push(resourceWatcher);
+        resourceWatcher = this.createAndAddResourceWatcher(resource);
       }
       return resourceWatcher;
     };

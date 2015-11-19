@@ -20,6 +20,11 @@ rw.factory 'CollectionWatcher', (ResourceWatcher, $q) ->
 		isNew: =>
 			_.some @collection, (it) => it.isNew()
 
+		createAndAddResourceWatcher: (resource) =>
+			resourceWatcher = @_createResourceWatcher resource
+			@resourceWatchers.push resourceWatcher
+			resourceWatcher
+
 		_createResourceWatcher: (resource) =>
 			new ResourceWatcher @scope, resource
 
@@ -42,6 +47,5 @@ rw.factory 'CollectionWatcher', (ResourceWatcher, $q) ->
 		_getOrCreateResourceWatcher: (resource) =>
 			resourceWatcher = _.find @resourceWatchers, (it) -> it.resource == resource
 			if !resourceWatcher
-				resourceWatcher = @_createResourceWatcher resource
-				@resourceWatchers.push resourceWatcher
+				resourceWatcher = @createAndAddResourceWatcher resource
 			resourceWatcher			
