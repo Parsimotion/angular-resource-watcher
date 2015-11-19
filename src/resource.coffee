@@ -104,17 +104,9 @@ rw = angular.module('resource.watcher', ['ngResource'])
 
     class Resource
       
-      build = (object) -> new Resource object
-      
-      @get: (parameters) ->
-        api.get(parameters).$promise.then build
-
-      @query: (parameters) ->
-        api.query(parameters).$promise.then (arr) -> arr.map build
-
       constructor: (object) ->
         @_state = if @_isExisting(object) then new ExistingResourceState() else new NewResourceState()
-        @updateValuesWith object
+        @updateValuesWith new api object
 
       _isExisting: (properties) -> properties?.id
 
@@ -144,7 +136,7 @@ rw = angular.module('resource.watcher', ['ngResource'])
         @_state.rollback this
 
       updateValuesWith: (object) =>
-        _.assign this, object
+        _.assign(_.assign(this, object), Object.getPrototypeOf(object))
 
       sendPost: (options) =>
         api.save(options, this).$promise
@@ -154,3 +146,16 @@ rw = angular.module('resource.watcher', ['ngResource'])
 
       sendDelete: (options) =>
         api.delete(options, this).$promise
+
+
+    _.assign Resource, api
+
+    build = (object) -> new Resource object
+
+    Resource.get = (parameters) ->
+      api.get(parameters).$promise.then build
+
+    Resource.query = (parameters) ->
+      api.query(parameters).$promise.then (arr) -> arr.map build
+
+    Resource
