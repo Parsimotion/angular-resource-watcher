@@ -20,6 +20,9 @@ rw.factory 'CollectionWatcher', (ResourceWatcher, $q) ->
 		isNew: =>
 			_.some @collection, (it) => it.isNew()
 
+		watch: =>
+			@resourceWatchers.forEach (it) => it.watch()
+
 		createAndAddResourceWatcher: (resource) =>
 			resourceWatcher = @_createResourceWatcher resource
 			@resourceWatchers.push resourceWatcher
@@ -29,12 +32,11 @@ rw.factory 'CollectionWatcher', (ResourceWatcher, $q) ->
 			new ResourceWatcher @scope, resource
 
 		_removeNewResources: =>
-			newResources = @collection.filter (it) -> it.isNew()
-			newResources.forEach _.partial _.remove, @collection			
+			_.remove @collection, (it) => it.isNew()		
 
 		_rollbackDirtyResources: =>
-			dirtyWatchers = _.filter @resourceWatchers, (it) -> it.isDirty()
-			dirtyWatchers.forEach (it) -> it.cancel()
+			@collection.forEach (it) => it.rollback()
+			@watch()
 
 		_saveResource: (options, resource) =>
 			resource.save(options)

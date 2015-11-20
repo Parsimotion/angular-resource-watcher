@@ -1,4 +1,4 @@
-/* angular-resource-watcher - v0.0.2 - 2015-11-19 */
+/* angular-resource-watcher - v0.0.2 - 2015-11-20 */
 'use strict';
 var rw,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
@@ -253,16 +253,24 @@ rw = angular.module('resource.watcher', ['ngResource']).factory('resource', func
 
     })();
     _.assign(Resource, api);
-    build = function(object) {
-      return new Resource(object);
+    build = function(referedClass, object) {
+      return new referedClass(object);
     };
     Resource.get = function(parameters) {
-      return api.get(parameters).$promise.then(build);
+      return api.get(parameters).$promise.then((function(_this) {
+        return function(object) {
+          return build(_this, object);
+        };
+      })(this));
     };
     Resource.query = function(parameters) {
-      return api.query(parameters).$promise.then(function(arr) {
-        return arr.map(build);
-      });
+      return api.query(parameters).$promise.then((function(_this) {
+        return function(arr) {
+          return arr.map(function(it) {
+            return build(_this, it);
+          });
+        };
+      })(this));
     };
     return Resource;
   };
@@ -284,6 +292,7 @@ rw.factory('CollectionWatcher', function(ResourceWatcher, $q) {
       this._removeNewResources = __bind(this._removeNewResources, this);
       this._createResourceWatcher = __bind(this._createResourceWatcher, this);
       this.createAndAddResourceWatcher = __bind(this.createAndAddResourceWatcher, this);
+      this.watch = __bind(this.watch, this);
       this.isNew = __bind(this.isNew, this);
       this.isDirty = __bind(this.isDirty, this);
       this.save = __bind(this.save, this);
@@ -322,6 +331,14 @@ rw.factory('CollectionWatcher', function(ResourceWatcher, $q) {
       })(this));
     };
 
+    CollectionWatcher.prototype.watch = function() {
+      return this.resourceWatchers.forEach((function(_this) {
+        return function(it) {
+          return it.watch();
+        };
+      })(this));
+    };
+
     CollectionWatcher.prototype.createAndAddResourceWatcher = function(resource) {
       var resourceWatcher;
       resourceWatcher = this._createResourceWatcher(resource);
@@ -334,21 +351,20 @@ rw.factory('CollectionWatcher', function(ResourceWatcher, $q) {
     };
 
     CollectionWatcher.prototype._removeNewResources = function() {
-      var newResources;
-      newResources = this.collection.filter(function(it) {
-        return it.isNew();
-      });
-      return newResources.forEach(_.partial(_.remove, this.collection));
+      return _.remove(this.collection, (function(_this) {
+        return function(it) {
+          return it.isNew();
+        };
+      })(this));
     };
 
     CollectionWatcher.prototype._rollbackDirtyResources = function() {
-      var dirtyWatchers;
-      dirtyWatchers = _.filter(this.resourceWatchers, function(it) {
-        return it.isDirty();
-      });
-      return dirtyWatchers.forEach(function(it) {
-        return it.cancel();
-      });
+      this.collection.forEach((function(_this) {
+        return function(it) {
+          return it.rollback();
+        };
+      })(this));
+      return this.watch();
     };
 
     CollectionWatcher.prototype._saveResource = function(options, resource) {
