@@ -148,7 +148,7 @@ rw = angular.module('resource.watcher', ['ngResource']).factory('resource', func
 
   })(ExistingResourceState);
   return function(url, parameters, actions) {
-    var Resource, api, build, defaultActions, defaultParams, toDto;
+    var Resource, api, defaultActions, defaultParams, toDto;
     if (parameters == null) {
       parameters = {};
     }
@@ -253,13 +253,13 @@ rw = angular.module('resource.watcher', ['ngResource']).factory('resource', func
 
     })();
     _.assign(Resource, api);
-    build = function(referedClass, object) {
-      return new referedClass(object);
+    Resource._build = function(object) {
+      return new this(object);
     };
     Resource.get = function(parameters) {
       return api.get(parameters).$promise.then((function(_this) {
         return function(object) {
-          return build(_this, object);
+          return _this._build(object);
         };
       })(this));
     };
@@ -267,7 +267,7 @@ rw = angular.module('resource.watcher', ['ngResource']).factory('resource', func
       return api.query(parameters).$promise.then((function(_this) {
         return function(arr) {
           return arr.map(function(it) {
-            return build(_this, it);
+            return _this._build(it);
           });
         };
       })(this));
