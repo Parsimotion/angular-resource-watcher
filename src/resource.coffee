@@ -150,12 +150,13 @@ rw = angular.module('resource.watcher', ['ngResource'])
 
     _.assign Resource, api
 
-    build = (object) -> new Resource object
+    build = (referedClass, object) -> new referedClass object
 
     Resource.get = (parameters) ->
-      api.get(parameters).$promise.then build
+      api.get(parameters).$promise.then (object) =>
+        build this, object
 
     Resource.query = (parameters) ->
-      api.query(parameters).$promise.then (arr) -> arr.map build
+      api.query(parameters).$promise.then (arr) => arr.map (it) => build this, it
 
     Resource
