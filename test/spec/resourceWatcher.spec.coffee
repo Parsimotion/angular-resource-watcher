@@ -9,8 +9,6 @@ describe "ResourceWatcher", ->
 			scope = $rootScope.$new()
 
 			class ConcreteResource extends resource '/api-mock/'
-				getApi: =>
-					resourceFactory
 
 			watchedResource = new ConcreteResource id: 8, name: "Yerba mate Union", weight: "500g"
 
