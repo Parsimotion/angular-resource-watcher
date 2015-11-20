@@ -25,6 +25,7 @@ module.exports = function(config) {
       'bower_components/angular-rx/dist/rx.angular.js',
       'bower_components/angular-translate/angular-translate.js',
       'bower_components/angular-translate-loader-url/angular-translate-loader-url.js',
+      'src/resource.coffee',
       'src/*.coffee',
       'test/specSetup.coffee',
       'test/spec/**/*.coffee'

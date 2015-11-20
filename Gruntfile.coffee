@@ -38,7 +38,7 @@ module.exports = (grunt) ->
       options:
         banner: '<%= meta.banner %>'
       dist:
-        src: 'compile/**/*.js'
+        src: ['compile/resource.js', 'compile/**/*.js']
         dest: 'build/angular-resource-watcher.js'
     uglify:
       options:
@@ -52,7 +52,7 @@ module.exports = (grunt) ->
         configFile: "karma.conf.js"
         singleRun: true
 
-  grunt.registerTask 'default', ['coffeelint', 'clean', 'coffee', 'concat', 'uglify']
+  grunt.registerTask 'default', ['clean', 'coffee', 'concat', 'uglify']
 
   grunt.registerTask 'test', [
     "coffee"

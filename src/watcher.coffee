@@ -4,53 +4,66 @@ rw.constant "watcherConfig",
   save: 'Guardar'
   cancel: 'Cancelar'
 
-rw.directive "watcher", (watcherConfig) ->
+rw.directive "watcher", (watcherConfig, ResourceWatcher, CollectionWatcher, $parse) ->
   template = """
 <div ng-show="isDirty()">
-  <input type="submit" ng-value="saveLabel" class="btn btn-primary"/><a href="" ng-click="cancel()" ng-show="cancelVisible()" class="cancel-link">{{ cancelLabel }}</a>
+  <input type="submit" ng-value="saveLabel" class="btn btn-primary"/><a href="" ng-click="cancel()" class="cancel-link">{{ cancelLabel }}</a>
 </div>
   """
 
   template: template
   restrict: 'E'
   replace: true
-  scope:
-    resource: "="
-    onCancelWhenNew: "&"
+  scope: true
 
-  link: (scope, formElement, attributes) ->
+  controller: ($scope, $attrs) ->
+    @addWatcher = (watcher) ->
+      $scope.watcher = watcher
 
-    watch = ->
-      unsubscribe = scope.$watch (-> scope.resource), (newValue, oldValue) ->
-        return if newValue == oldValue
-        if newValue != oldValue
-          scope.resource.setAsDirty(oldValue)
-          unsubscribe()
-      , true
+    $scope.saveLabel = watcherConfig.save
+    $scope.cancelLabel = watcherConfig.cancel
 
-    scope.saveLabel = watcherConfig.save
-    scope.cancelLabel = watcherConfig.cancel
+    $scope.cancel = ->
+      $scope.watcher.cancel()
 
-    scope.cancel = ->
-      if scope.resource.isNew()
-        scope.onCancelWhenNew()
-      else
-        scope.resource.rollback()
-        watch()
+    $scope.isDirty = ->
+      $scope.watcher.isDirty()
 
-    scope.isDirty = ->
-      scope.resource.isDirty()
+    $scope.isNew = ->
+      $scope.watcher.isNew()
 
-    scope.isNew = ->
-      scope.resource.isNew()
+    $scope.$on 'save', (e, options) ->
+     $scope.watcher.save(options)
 
-    scope.cancelVisible = ->
-      not scope.isNew() or attributes.onCancelWhenNew?
 
-    scope.$on 'save', (e, options) ->
-      scope.resource.save(options).then watch
+.directive "watchResource", (ResourceWatcher, $parse) ->
+  restrict: 'A'
+  require: '^watcher'
+  scope: false
 
-    watch()
+  link: (scope, formElement, attrs, controller) ->
+    resource = $parse(attrs.watchResource)(scope)
+    controller.addWatcher new ResourceWatcher(scope, resource)
+
+
+.directive "watchResourceCollection", (CollectionWatcher, $parse) ->
+  restrict: 'A'
+  scope: false
+  require: '^watcher'
+
+  link: (scope, formElement, attrs, controller) ->
+    resources = $parse(attrs.watchResourceCollection)(scope)
+    controller.addWatcher new CollectionWatcher(scope, resources)
+
+
+.directive "customWatch", ($parse) ->
+  restrict: 'A'
+  scope: false
+  require: '^watcher'
+
+  link: (scope, formElement, attrs, controller) ->
+    controller.addWatcher $parse(attrs.customWatch)(scope)
+
 
 .directive "watcherSubmit", ($parse) ->
 
