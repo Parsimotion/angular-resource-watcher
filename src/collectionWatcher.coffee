@@ -7,8 +7,8 @@ rw.factory 'CollectionWatcher', (ResourceWatcher, $q) ->
 				@_createResourceWatcher it
 
 		cancel: =>
-			@_removeNewResources()
-			@_rollbackDirtyResources()
+			_.remove @collection, (it) => it.isNew()
+			@_rollbackResources()
 
 		save: (options) =>
 			savePromises = @collection.map _.partial @_saveResource, options
@@ -30,11 +30,8 @@ rw.factory 'CollectionWatcher', (ResourceWatcher, $q) ->
 
 		_createResourceWatcher: (resource) =>
 			new ResourceWatcher @scope, resource
-
-		_removeNewResources: =>
-			_.remove @collection, (it) => it.isNew()		
-
-		_rollbackDirtyResources: =>
+			
+		_rollbackResources: =>
 			@collection.forEach (it) => it.rollback()
 			@watch()
 

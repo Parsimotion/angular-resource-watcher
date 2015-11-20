@@ -288,8 +288,7 @@ rw.factory('CollectionWatcher', function(ResourceWatcher, $q) {
       this._getOrCreateResourceWatcher = __bind(this._getOrCreateResourceWatcher, this);
       this._watchResource = __bind(this._watchResource, this);
       this._saveResource = __bind(this._saveResource, this);
-      this._rollbackDirtyResources = __bind(this._rollbackDirtyResources, this);
-      this._removeNewResources = __bind(this._removeNewResources, this);
+      this._rollbackResources = __bind(this._rollbackResources, this);
       this._createResourceWatcher = __bind(this._createResourceWatcher, this);
       this.createAndAddResourceWatcher = __bind(this.createAndAddResourceWatcher, this);
       this.watch = __bind(this.watch, this);
@@ -305,8 +304,12 @@ rw.factory('CollectionWatcher', function(ResourceWatcher, $q) {
     }
 
     CollectionWatcher.prototype.cancel = function() {
-      this._removeNewResources();
-      return this._rollbackDirtyResources();
+      _.remove(this.collection, (function(_this) {
+        return function(it) {
+          return it.isNew();
+        };
+      })(this));
+      return this._rollbackResources();
     };
 
     CollectionWatcher.prototype.save = function(options) {
@@ -350,15 +353,7 @@ rw.factory('CollectionWatcher', function(ResourceWatcher, $q) {
       return new ResourceWatcher(this.scope, resource);
     };
 
-    CollectionWatcher.prototype._removeNewResources = function() {
-      return _.remove(this.collection, (function(_this) {
-        return function(it) {
-          return it.isNew();
-        };
-      })(this));
-    };
-
-    CollectionWatcher.prototype._rollbackDirtyResources = function() {
+    CollectionWatcher.prototype._rollbackResources = function() {
       this.collection.forEach((function(_this) {
         return function(it) {
           return it.rollback();
