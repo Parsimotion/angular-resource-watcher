@@ -1,4 +1,4 @@
-/* angular-resource-watcher - v0.0.2 - 2015-11-20 */
+/* angular-resource-watcher - v0.0.3 - 2015-11-25 */
 'use strict';
 var rw,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
@@ -295,6 +295,7 @@ rw.factory('CollectionWatcher', function(ResourceWatcher, $q) {
       this.isNew = __bind(this.isNew, this);
       this.isDirty = __bind(this.isDirty, this);
       this.save = __bind(this.save, this);
+      this._removeNewElements = __bind(this._removeNewElements, this);
       this.cancel = __bind(this.cancel, this);
       this.resourceWatchers = this.collection.map((function(_this) {
         return function(it) {
@@ -304,12 +305,16 @@ rw.factory('CollectionWatcher', function(ResourceWatcher, $q) {
     }
 
     CollectionWatcher.prototype.cancel = function() {
-      _.remove(this.collection, (function(_this) {
+      this._removeNewElements(this.collection);
+      return this._rollbackResources();
+    };
+
+    CollectionWatcher.prototype._removeNewElements = function(collection) {
+      return _.remove(collection, (function(_this) {
         return function(it) {
           return it.isNew();
         };
       })(this));
-      return this._rollbackResources();
     };
 
     CollectionWatcher.prototype.save = function(options) {
