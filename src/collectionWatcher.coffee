@@ -7,8 +7,11 @@ rw.factory 'CollectionWatcher', (ResourceWatcher, $q) ->
 				@_createResourceWatcher it
 
 		cancel: =>
-			_.remove @collection, (it) => it.isNew()
+			@_removeNewElements @collection
 			@_rollbackResources()
+
+		_removeNewElements: (collection) =>
+			_.remove collection, (it) => it.isNew()
 
 		save: (options) =>
 			savePromises = @collection.map _.partial @_saveResource, options
