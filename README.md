@@ -13,7 +13,7 @@ angular.module('myModule', ['resource.watcher']);
 
 # Features
   * When a Resource is new (doesn't have the property id) and save is called, it sends a POST. When it is an existing Resource (it has the property id) and save is called, it sends a PUT.
-  * When a Resource has not been change and save is called it does'n send any requrest.
+  * When a Resource has not been change and save is called it does'n send any request.
   * A Resource can rollback to a previous state (cancel logic)
   * The Watcher directive watches for changes on a resource. When the resource is changed, the watcher displays the saver or cancel buttons
   * Form validation
