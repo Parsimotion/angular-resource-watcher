@@ -1,4 +1,4 @@
-/* angular-resource-watcher - v0.0.3 - 2015-11-25 */
+/* angular-resource-watcher - v0.0.3 - 2015-12-16 */
 'use strict';
 var rw,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
@@ -458,7 +458,7 @@ rw.constant("watcherConfig", {
 
 rw.directive("watcher", function(watcherConfig, ResourceWatcher, CollectionWatcher, $parse) {
   var template;
-  template = "<div ng-show=\"isDirty()\">\n  <input type=\"submit\" ng-value=\"saveLabel\" class=\"btn btn-primary\"/><a href=\"\" ng-click=\"cancel()\" class=\"cancel-link\">{{ cancelLabel }}</a>\n</div>";
+  template = "<aside>\n  <div class=\"button-container\" ng-show=\"isDirty()\">\n    <input type=\"submit\" ng-value=\"saveLabel\" class=\"btn btn-success\"/><a href=\"\" ng-click=\"cancel()\" class=\"cancel-link\">{{ cancelLabel }}</a>\n  </div>\n</aside>";
   return {
     template: template,
     restrict: 'E',
