@@ -1,4 +1,4 @@
-/* angular-resource-watcher - v0.0.3 - 2015-12-16 */
+/* angular-resource-watcher - v0.0.3 - 2016-01-05 */
 'use strict';
 var rw,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
@@ -175,6 +175,7 @@ rw = angular.module('resource.watcher', ['ngResource']).factory('resource', func
     api = $resource(url, defaultParams, defaultActions);
     Resource = (function() {
       function Resource(object) {
+        this.toDto = __bind(this.toDto, this);
         this.sendDelete = __bind(this.sendDelete, this);
         this.sendPut = __bind(this.sendPut, this);
         this.sendPost = __bind(this.sendPost, this);
@@ -238,15 +239,19 @@ rw = angular.module('resource.watcher', ['ngResource']).factory('resource', func
       };
 
       Resource.prototype.sendPost = function(options) {
-        return api.save(options, this).$promise;
+        return api.save(options, this.toDto()).$promise;
       };
 
       Resource.prototype.sendPut = function(options) {
-        return api.update(options, this).$promise;
+        return api.update(options, this.toDto()).$promise;
       };
 
       Resource.prototype.sendDelete = function(options) {
         return api["delete"](options, this).$promise;
+      };
+
+      Resource.prototype.toDto = function() {
+        return this;
       };
 
       return Resource;

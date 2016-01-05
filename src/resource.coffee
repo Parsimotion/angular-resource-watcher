@@ -139,14 +139,15 @@ rw = angular.module('resource.watcher', ['ngResource'])
         _.assign(_.assign(this, object), Object.getPrototypeOf(object))
 
       sendPost: (options) =>
-        api.save(options, this).$promise
+        api.save(options, @toDto()).$promise
 
       sendPut: (options) =>
-        api.update(options, this).$promise
+        api.update(options, @toDto()).$promise
 
       sendDelete: (options) =>
         api.delete(options, this).$promise
 
+      toDto: => this
 
     _.assign Resource, api
 
