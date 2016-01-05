@@ -1,10 +1,7 @@
 {
   "name": "angular-resource-watcher",
-    "version": "0.0.6",
-  "main": [
-    "build/angular-resource-watcher.js",
-    "build/angular-resource-watcher.css"
-  ],
+  "version": "0.0.6",
+  "main": "build/angular-resource-watcher.js",
   "ignore": [
     "**/.*",
     "_*",
