@@ -1,4 +1,4 @@
-/* angular-resource-watcher - v0.0.3 - 2016-01-05 */
+/* angular-resource-watcher - v0.0.6 - 2016-01-15 */
 'use strict';
 var rw,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
@@ -180,6 +180,7 @@ rw = angular.module('resource.watcher', ['ngResource']).factory('resource', func
         this.sendPut = __bind(this.sendPut, this);
         this.sendPost = __bind(this.sendPost, this);
         this.updateValuesWith = __bind(this.updateValuesWith, this);
+        this.setValuesWith = __bind(this.setValuesWith, this);
         this.rollback = __bind(this.rollback, this);
         this.isDirty = __bind(this.isDirty, this);
         this.setAsPristine = __bind(this.setAsPristine, this);
@@ -189,7 +190,7 @@ rw = angular.module('resource.watcher', ['ngResource']).factory('resource', func
         this["delete"] = __bind(this["delete"], this);
         this.save = __bind(this.save, this);
         this._state = this._isExisting(object) ? new ExistingResourceState() : new NewResourceState();
-        this.updateValuesWith(new api(object));
+        this.setValuesWith(new api(object));
       }
 
       Resource.prototype._isExisting = function(properties) {
@@ -234,8 +235,12 @@ rw = angular.module('resource.watcher', ['ngResource']).factory('resource', func
         return this._state.rollback(this);
       };
 
-      Resource.prototype.updateValuesWith = function(object) {
+      Resource.prototype.setValuesWith = function(object) {
         return _.assign(_.assign(this, object), Object.getPrototypeOf(object));
+      };
+
+      Resource.prototype.updateValuesWith = function(object) {
+        return this.setValuesWith(object);
       };
 
       Resource.prototype.sendPost = function(options) {

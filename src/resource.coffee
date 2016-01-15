@@ -106,7 +106,7 @@ rw = angular.module('resource.watcher', ['ngResource'])
       
       constructor: (object) ->
         @_state = if @_isExisting(object) then new ExistingResourceState() else new NewResourceState()
-        @updateValuesWith new api object
+        @setValuesWith new api object
 
       _isExisting: (properties) -> properties?.id
 
@@ -135,9 +135,12 @@ rw = angular.module('resource.watcher', ['ngResource'])
       rollback: =>
         @_state.rollback this
 
-      updateValuesWith: (object) =>
+      setValuesWith: (object) =>
         _.assign(_.assign(this, object), Object.getPrototypeOf(object))
 
+      updateValuesWith: (object) =>
+        @setValuesWith object
+        
       sendPost: (options) =>
         api.save(options, @toDto()).$promise
 

@@ -14,7 +14,12 @@ describe "CollectionWatcher", ->
 			ConcreteClass = class ConcreteResource extends resource '/api-mock/'
 
 			resource1 = new ConcreteClass id: 21, name: "Yerba mate Union"
-			resource2 = new ConcreteClass id: 22, name: "Harina Blancaflor"
+			resource2 = new ConcreteClass
+				id: 22
+				name: "Harina Blancaflor"
+				iHaveACollection:
+					collection: [1, 2, 3, 4]
+
 
 			collection = [resource1, resource2]
 			collectionWatcher = new CollectionWatcher scope, collection
@@ -45,12 +50,11 @@ describe "CollectionWatcher", ->
 
 	describe "when rolledback", ->
 		beforeEach ->
-			inject ->
-				scope.$apply ->
-					resource1.name = "Yerba mate La Tranquera"
-					collection.push new ConcreteClass name: "Pan rallado Preferido"
-				scope.$apply ->
-					collectionWatcher.cancel()
+			scope.$apply ->
+				resource1.name = "Yerba mate La Tranquera"
+				collection.push new ConcreteClass name: "Pan rallado Preferido"
+			scope.$apply ->
+				collectionWatcher.cancel()
 
 		it "should revert modified resources to the previous sate", ->
 			expect(resource1.name).toBe "Yerba mate Union"

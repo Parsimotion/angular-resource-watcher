@@ -10,7 +10,12 @@ describe "ResourceWatcher", ->
 
 			class ConcreteResource extends resource '/api-mock/'
 
-			watchedResource = new ConcreteResource id: 8, name: "Yerba mate Union", weight: "500g"
+			watchedResource = new ConcreteResource
+				id: 8
+				name: "Yerba mate Union"
+				weight: "500g"
+				iHaveACollection: 
+					collection: [1, 2, 3, 4]
 
 			resourceWatcher = new ResourceWatcher scope, watchedResource
 			scope.$apply()
@@ -24,6 +29,8 @@ describe "ResourceWatcher", ->
 			scope.$apply()
 			watchedResource.weight = "1000g"
 			scope.$apply()
+			watchedResource.iHaveACollection.collection.pop()
+			scope.$apply()
 
 		it "should set the resource as dirty", ->
 			expect(watchedResource.isDirty()).toBeTruthy()
@@ -36,6 +43,9 @@ describe "ResourceWatcher", ->
 
 			it "should return the resource to it's previous state on properties that apply to the pick function", ->
 				expect(watchedResource.name).toBe "Yerba mate Union"
+
+			it "should return the inner collection to its previous state", ->
+				expect(watchedResource.iHaveACollection.collection.length).toBe 4
 
 			it "should set the resource as not dirty", ->
 				expect(watchedResource.isDirty()).toBeFalsy()
