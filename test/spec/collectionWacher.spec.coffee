@@ -2,14 +2,16 @@ describe "CollectionWatcher", ->
 
 	collectionWatcher = null
 	scope = null
+	httpBackend = null
 	resource1 = null
 	resource2 = null
 	collection = null
 	ConcreteClass = null
 
 	beforeEach ->
-		inject ($rootScope, resource, CollectionWatcher) ->
+		inject ($rootScope, resource, $httpBackend, CollectionWatcher) ->
 			scope = $rootScope.$new()
+			httpBackend = $httpBackend
 
 			ConcreteClass = class ConcreteResource extends resource '/api-mock/'
 
@@ -19,7 +21,6 @@ describe "CollectionWatcher", ->
 				name: "Harina Blancaflor"
 				iHaveACollection:
 					collection: [1, 2, 3, 4]
-
 
 			collection = [resource1, resource2]
 			collectionWatcher = new CollectionWatcher scope, collection
@@ -56,7 +57,7 @@ describe "CollectionWatcher", ->
 			scope.$apply ->
 				collectionWatcher.cancel()
 
-		it "should revert modified resources to the previous sate", ->
+		it "should revert modified resources to the previous state", ->
 			expect(resource1.name).toBe "Yerba mate Union"
 
 		it "should remove new resources from collection", ->
@@ -69,3 +70,20 @@ describe "CollectionWatcher", ->
 			scope.$apply ->
 				resource1.name = "Yerba mate Nobleza Gaucha"
 			expect(collectionWatcher.isDirty()).toBeTruthy()
+
+	describe "when an element is removed from the collection", ->
+		beforeEach ->
+			scope.$apply ->
+				_.pull collection, resource1
+
+		it "should be dirty", ->
+			expect(collectionWatcher.isDirty()).toBeTruthy()
+
+		it "when saved should delete the corresponding elements", ->
+			collectionWatcher.save()
+			httpBackend.expectDELETE("/api-mock?id=21").respond 200
+			httpBackend.flush()
+
+		it "when canceled should add the deleted elements again", ->
+			collectionWatcher.cancel()
+			expect(collectionWatcher.collection).toEqual [resource1, resource2]
