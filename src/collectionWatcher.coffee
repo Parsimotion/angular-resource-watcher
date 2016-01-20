@@ -26,7 +26,7 @@ rw.factory 'CollectionWatcher', (ResourceWatcher, $q) ->
 		_deleteIfNecessary: =>
 			objectsIds = _.map @collection, (it) => it.id
 			toDeleteElements = _.filter @previousState, (it) => !_.includes @collection, it
-			toDeleteElements.map (it) => it.delete()
+			toDeleteElements.forEach (it) => it.delete()
 
 		isDirty: =>
 			@hasChanges or _.some @collection, (it) => it.isDirty()
