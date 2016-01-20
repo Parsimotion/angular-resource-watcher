@@ -344,18 +344,13 @@ rw.factory('CollectionWatcher', function(ResourceWatcher, $q) {
     };
 
     CollectionWatcher.prototype._deleteIfNecessary = function() {
-      var objectsIds, toDeleteElements;
-      objectsIds = _.map(this.collection, (function(_this) {
+      var toDeleteElements;
+      toDeleteElements = _.reject(this.previousState, (function(_this) {
         return function(it) {
-          return it.id;
+          return _.includes(_this.collection, it);
         };
       })(this));
-      toDeleteElements = _.filter(this.previousState, (function(_this) {
-        return function(it) {
-          return !_.includes(_this.collection, it);
-        };
-      })(this));
-      return toDeleteElements.map((function(_this) {
+      return toDeleteElements.forEach((function(_this) {
         return function(it) {
           return it["delete"]();
         };
