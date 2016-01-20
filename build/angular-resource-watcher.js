@@ -1,4 +1,4 @@
-/* angular-resource-watcher - v0.0.8 - 2016-01-18 */
+/* angular-resource-watcher - v0.0.8 - 2016-01-20 */
 'use strict';
 var rw,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
@@ -307,7 +307,7 @@ rw.factory('CollectionWatcher', function(ResourceWatcher, $q) {
       this.watch = __bind(this.watch, this);
       this.isNew = __bind(this.isNew, this);
       this.isDirty = __bind(this.isDirty, this);
-      this._deleteIfNecesary = __bind(this._deleteIfNecesary, this);
+      this._deleteIfNecessary = __bind(this._deleteIfNecessary, this);
       this.save = __bind(this.save, this);
       this._removeNewElements = __bind(this._removeNewElements, this);
       this.cancel = __bind(this.cancel, this);
@@ -337,13 +337,13 @@ rw.factory('CollectionWatcher', function(ResourceWatcher, $q) {
     CollectionWatcher.prototype.save = function(options) {
       var savePromises;
       this.watchCollection();
-      this._deleteIfNecesary();
+      this._deleteIfNecessary();
       savePromises = this.collection.map(_.partial(this._saveResource, options));
       $q.all(savePromises);
       return this.hasChanges = false;
     };
 
-    CollectionWatcher.prototype._deleteIfNecesary = function() {
+    CollectionWatcher.prototype._deleteIfNecessary = function() {
       var objectsIds, toDeleteElements;
       objectsIds = _.map(this.collection, (function(_this) {
         return function(it) {
