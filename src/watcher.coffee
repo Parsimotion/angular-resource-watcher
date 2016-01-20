@@ -6,8 +6,8 @@ rw.constant "watcherConfig",
 
 rw.directive "watcher", (watcherConfig, ResourceWatcher, CollectionWatcher, $parse) ->
   template = """
-<aside>
-  <div class="button-container" ng-show="isDirty()">
+<aside class="button-container">
+  <div ng-show="isDirty()">
     <input type="submit" ng-value="saveLabel" class="btn btn-success"/><a href="" ng-click="cancel()" class="cancel-link">{{ cancelLabel }}</a>
   </div>
 </aside>
