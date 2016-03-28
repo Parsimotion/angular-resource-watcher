@@ -3,7 +3,7 @@
 rw = angular.module('resource.watcher', ['ngResource'])
 
 .factory 'resource', ($q, $resource) ->
-  omitPrivate = (obj) -> _.omit obj, (_, key) -> key.indexOf('_') is 0
+  omitPrivate = (obj) -> _.omitBy obj, (_, key) -> key.indexOf('_') is 0
 
   class DirtyState
     constructor: (@previousState) ->
@@ -20,7 +20,7 @@ rw = angular.module('resource.watcher', ['ngResource'])
       resource.setAsPristine()
 
     _deleteAddedProperties: (resource) =>
-      omitPrivateAndFunctions = (obj) -> _.omit omitPrivate(resource), _.isFunction
+      omitPrivateAndFunctions = (obj) -> _.omitBy omitPrivate(resource), _.isFunction
       addedProperties = _.difference _.keys(omitPrivateAndFunctions resource), _.keys(@previousState)
       addedProperties.forEach (key) -> delete resource[key]
 
