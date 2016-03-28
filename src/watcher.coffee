@@ -37,6 +37,8 @@ rw.directive "watcher", (watcherConfig, ResourceWatcher, CollectionWatcher, $par
     $scope.$on 'save', (e, options) ->
      $scope.watcher.save(options)
 
+    @
+
 
 .directive "watchResource", (ResourceWatcher, $parse) ->
   restrict: 'A'
