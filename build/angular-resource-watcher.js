@@ -1,4 +1,4 @@
-/* angular-resource-watcher - v0.0.9 - 2016-01-20 */
+/* angular-resource-watcher - v0.0.10 - 2016-03-28 */
 'use strict';
 var rw,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
@@ -8,7 +8,7 @@ var rw,
 rw = angular.module('resource.watcher', ['ngResource']).factory('resource', function($q, $resource) {
   var DirtyState, ExistingResourceState, NewResourceState, PristineState, omitPrivate;
   omitPrivate = function(obj) {
-    return _.omit(obj, function(_, key) {
+    return _.omitBy(obj, function(_, key) {
       return key.indexOf('_') === 0;
     });
   };
@@ -36,7 +36,7 @@ rw = angular.module('resource.watcher', ['ngResource']).factory('resource', func
     DirtyState.prototype._deleteAddedProperties = function(resource) {
       var addedProperties, omitPrivateAndFunctions;
       omitPrivateAndFunctions = function(obj) {
-        return _.omit(omitPrivate(resource), _.isFunction);
+        return _.omitBy(omitPrivate(resource), _.isFunction);
       };
       addedProperties = _.difference(_.keys(omitPrivateAndFunctions(resource)), _.keys(this.previousState));
       return addedProperties.forEach(function(key) {
@@ -540,9 +540,10 @@ rw.directive("watcher", function(watcherConfig, ResourceWatcher, CollectionWatch
       $scope.isNew = function() {
         return $scope.watcher.isNew();
       };
-      return $scope.$on('save', function(e, options) {
+      $scope.$on('save', function(e, options) {
         return $scope.watcher.save(options);
       });
+      return this;
     }
   };
 }).directive("watchResource", function(ResourceWatcher, $parse) {
