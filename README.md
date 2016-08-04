@@ -26,6 +26,11 @@ Same as $resource but without the $
 For example:
 `class Comment extends resource '/posts/:post/comments/:id'`
 
+If your resource is **singleton** (`GET /resource` and PUT `/resource`), add this little hack:
+```coffee
+  _isExisting: -> true
+```
+
 ### Watcher
 ```html
 <form name="default" watcher-submit='{post: postId}'>
