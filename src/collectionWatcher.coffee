@@ -2,9 +2,9 @@
 
 rw.factory 'CollectionWatcher', (ResourceWatcher, $q) ->
 	class CollectionWatcher
-		constructor: (@scope, @collection) ->
+		constructor: (@scope, @collection, options) ->
 			@resourceWatchers = @collection.map (it) =>
-				@_createResourceWatcher it
+				@_createResourceWatcher it, options
 			@hasChanges = false
 			@watchCollection()
 
@@ -53,8 +53,8 @@ rw.factory 'CollectionWatcher', (ResourceWatcher, $q) ->
 			@resourceWatchers.push resourceWatcher
 			resourceWatcher
 
-		_createResourceWatcher: (resource) =>
-			new ResourceWatcher @scope, resource
+		_createResourceWatcher: (resource, options) =>
+			new ResourceWatcher @scope, resource, options
 			
 		_rollbackResources: =>
 			@collection.forEach (it) => it.rollback()

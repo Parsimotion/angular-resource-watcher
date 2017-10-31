@@ -2,8 +2,9 @@
 
 rw.factory 'ResourceWatcher', ->
   class ResourceWatcher
-  	constructor: (@scope, @watchedResource) ->
-       	@watch()
+    constructor: (@scope, @watchedResource, { autoWatch }) ->
+      autoWatch ?= true
+      @watch() if autoWatch
 
     watch: =>
       unsubscribe = @scope.$watch (=> @watchedResource), (newValue, oldValue) =>
@@ -17,7 +18,7 @@ rw.factory 'ResourceWatcher', ->
       @watch()
 
     save: (options) =>
-    	@watchedResource.save(options).then @watch
+      @watchedResource.save(options).then @watch
 
     isDirty:  =>
       @watchedResource.isDirty()
