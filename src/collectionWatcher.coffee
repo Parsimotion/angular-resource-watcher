@@ -19,9 +19,10 @@ rw.factory 'CollectionWatcher', (ResourceWatcher, $q) ->
 		save: (options) =>
 			@watchCollection()
 			@_deleteIfNecessary()
-			savePromises = @collection.map _.partial @_saveResource, options
+			savePromises = @collection.map (it) =>
+				@_saveResource(options, it).catch(->) #because allSettled does not exist
+			@hasChanges = false      
 			$q.all savePromises
-			@hasChanges = false
 
 		_deleteIfNecessary: =>
 			toDeleteElements = _.reject @previousState, (it) => _.includes @collection, it
