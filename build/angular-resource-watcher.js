@@ -1,4 +1,4 @@
-/* angular-resource-watcher - v0.0.10 - 2016-03-28 */
+/* angular-resource-watcher - v0.1.0 - 2017-10-31 */
 'use strict';
 var rw,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
@@ -292,7 +292,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
 rw.factory('CollectionWatcher', function(ResourceWatcher, $q) {
   var CollectionWatcher;
   return CollectionWatcher = (function() {
-    function CollectionWatcher(scope, collection) {
+    function CollectionWatcher(scope, collection, options) {
       this.scope = scope;
       this.collection = collection;
       this._getOrCreateResourceWatcher = __bind(this._getOrCreateResourceWatcher, this);
@@ -313,7 +313,7 @@ rw.factory('CollectionWatcher', function(ResourceWatcher, $q) {
       this.cancel = __bind(this.cancel, this);
       this.resourceWatchers = this.collection.map((function(_this) {
         return function(it) {
-          return _this._createResourceWatcher(it);
+          return _this._createResourceWatcher(it, options);
         };
       })(this));
       this.hasChanges = false;
@@ -338,9 +338,13 @@ rw.factory('CollectionWatcher', function(ResourceWatcher, $q) {
       var savePromises;
       this.watchCollection();
       this._deleteIfNecessary();
-      savePromises = this.collection.map(_.partial(this._saveResource, options));
-      $q.all(savePromises);
-      return this.hasChanges = false;
+      savePromises = this.collection.map((function(_this) {
+        return function(it) {
+          return _this._saveResource(options, it)["catch"](function() {});
+        };
+      })(this));
+      this.hasChanges = false;
+      return $q.all(savePromises);
     };
 
     CollectionWatcher.prototype._deleteIfNecessary = function() {
@@ -410,8 +414,8 @@ rw.factory('CollectionWatcher', function(ResourceWatcher, $q) {
       return resourceWatcher;
     };
 
-    CollectionWatcher.prototype._createResourceWatcher = function(resource) {
-      return new ResourceWatcher(this.scope, resource);
+    CollectionWatcher.prototype._createResourceWatcher = function(resource, options) {
+      return new ResourceWatcher(this.scope, resource, options);
     };
 
     CollectionWatcher.prototype._rollbackResources = function() {
@@ -462,15 +466,22 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
 rw.factory('ResourceWatcher', function() {
   var ResourceWatcher;
   return ResourceWatcher = (function() {
-    function ResourceWatcher(scope, watchedResource) {
+    function ResourceWatcher(scope, watchedResource, _arg) {
+      var autoWatch;
       this.scope = scope;
       this.watchedResource = watchedResource;
+      autoWatch = _arg.autoWatch;
       this.isNew = __bind(this.isNew, this);
       this.isDirty = __bind(this.isDirty, this);
       this.save = __bind(this.save, this);
       this.cancel = __bind(this.cancel, this);
       this.watch = __bind(this.watch, this);
-      this.watch();
+      if (autoWatch == null) {
+        autoWatch = true;
+      }
+      if (autoWatch) {
+        this.watch();
+      }
     }
 
     ResourceWatcher.prototype.watch = function() {
