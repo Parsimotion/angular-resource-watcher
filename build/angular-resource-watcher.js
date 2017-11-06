@@ -1,4 +1,4 @@
-/* angular-resource-watcher - v0.1.0 - 2017-10-31 */
+/* angular-resource-watcher - v0.1.1 - 2017-11-06 */
 'use strict';
 var rw,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
@@ -470,7 +470,7 @@ rw.factory('ResourceWatcher', function() {
       var autoWatch;
       this.scope = scope;
       this.watchedResource = watchedResource;
-      autoWatch = _arg.autoWatch;
+      autoWatch = (_arg != null ? _arg : {}).autoWatch;
       this.isNew = __bind(this.isNew, this);
       this.isDirty = __bind(this.isDirty, this);
       this.save = __bind(this.save, this);

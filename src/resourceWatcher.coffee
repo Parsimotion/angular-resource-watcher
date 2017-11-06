@@ -2,7 +2,7 @@
 
 rw.factory 'ResourceWatcher', ->
   class ResourceWatcher
-    constructor: (@scope, @watchedResource, { autoWatch }) ->
+    constructor: (@scope, @watchedResource, { autoWatch } = {}) ->
       autoWatch ?= true
       @watch() if autoWatch
 
