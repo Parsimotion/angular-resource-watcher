@@ -51,6 +51,17 @@ module.exports = (grunt) ->
       unit:
         configFile: "karma.conf.js"
         singleRun: true
+    # Upgrade the version of the package
+    bump:
+      options:
+        files: ["package.json", "bower.json"]
+        commit: true
+        commitMessage: "Release v%VERSION%"
+        commitFiles: ["--all"]
+        createTag: true
+        tagName: "%VERSION%"
+        tagMessage: "Version %VERSION%"
+        push: false
 
   grunt.registerTask 'default', ['clean', 'coffee', 'concat', 'uglify']
 
