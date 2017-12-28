@@ -1,4 +1,4 @@
-/* angular-resource-watcher - v0.1.2 - 2017-12-28 */
+/* angular-resource-watcher - v1.0.0 - 2017-12-28 */
 'use strict';
 var rw,
   bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
@@ -354,7 +354,8 @@ rw.factory('CollectionWatcher', function(ResourceWatcher, $q) {
           })["catch"](function(error) {
             return {
               success: false,
-              error: error
+              error: error,
+              resource: it
             };
           });
         };
