@@ -16,7 +16,7 @@ rw.factory 'CollectionWatcher', (ResourceWatcher, $q) ->
 		_removeNewElements: (collection) =>
 			_.remove collection, (it) => it.isNew()
 
-		save: (options, { strict = true } = { strict: true }) =>
+		save: (options, { strict = true } = { }) =>
 			@watchCollection()
 			@_deleteIfNecessary()
 			savePromises = @collection.map (it) =>
