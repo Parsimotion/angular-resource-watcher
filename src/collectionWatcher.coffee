@@ -16,15 +16,15 @@ rw.factory 'CollectionWatcher', (ResourceWatcher, $q) ->
 		_removeNewElements: (collection) =>
 			_.remove collection, (it) => it.isNew()
 
-		save: (options, {strict = false}) =>
+		save: (options, { strict = true }) =>
 			@watchCollection()
 			@_deleteIfNecessary()
 			savePromises = @collection.map (it) =>
 				$save = @_saveResource(options, it)
 				return $save if strict
 				$save
-				.then (result) -> success: true, result 
-				.catch (error) -> success: false, error
+				.then (result) -> { success: true, result }
+				.catch (error) -> { success: false, error }
 
 			@hasChanges = false      
 			$q.all savePromises
