@@ -24,7 +24,7 @@ rw.factory 'CollectionWatcher', (ResourceWatcher, $q) ->
 				return $save if strict
 				$save
 				.then (result) -> { success: true, result }
-				.catch (error) -> { success: false, error }
+				.catch (error) -> { success: false, error, resource: it }
 
 			@hasChanges = false      
 			$q.all savePromises
