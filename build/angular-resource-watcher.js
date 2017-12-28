@@ -1,9 +1,9 @@
-/* angular-resource-watcher - v0.1.1 - 2017-11-06 */
+/* angular-resource-watcher - v0.1.2 - 2017-12-28 */
 'use strict';
 var rw,
-  __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
-  __hasProp = {}.hasOwnProperty,
-  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+  bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+  hasProp = {}.hasOwnProperty;
 
 rw = angular.module('resource.watcher', ['ngResource']).factory('resource', function($q, $resource) {
   var DirtyState, ExistingResourceState, NewResourceState, PristineState, omitPrivate;
@@ -13,10 +13,10 @@ rw = angular.module('resource.watcher', ['ngResource']).factory('resource', func
     });
   };
   DirtyState = (function() {
-    function DirtyState(previousState) {
-      this.previousState = previousState;
-      this._deleteAddedProperties = __bind(this._deleteAddedProperties, this);
-      this.rollback = __bind(this.rollback, this);
+    function DirtyState(previousState1) {
+      this.previousState = previousState1;
+      this._deleteAddedProperties = bind(this._deleteAddedProperties, this);
+      this.rollback = bind(this.rollback, this);
     }
 
     DirtyState.prototype.save = function(state, resource, options) {
@@ -65,12 +65,12 @@ rw = angular.module('resource.watcher', ['ngResource']).factory('resource', func
   })();
   ExistingResourceState = (function() {
     function ExistingResourceState() {
-      this.executeSave = __bind(this.executeSave, this);
-      this.setAsDirty = __bind(this.setAsDirty, this);
-      this.setAsPristine = __bind(this.setAsPristine, this);
-      this.rollback = __bind(this.rollback, this);
-      this.isDirty = __bind(this.isDirty, this);
-      this.save = __bind(this.save, this);
+      this.executeSave = bind(this.executeSave, this);
+      this.setAsDirty = bind(this.setAsDirty, this);
+      this.setAsPristine = bind(this.setAsPristine, this);
+      this.rollback = bind(this.rollback, this);
+      this.isDirty = bind(this.isDirty, this);
+      this.save = bind(this.save, this);
       this._state = new PristineState();
     }
 
@@ -114,8 +114,8 @@ rw = angular.module('resource.watcher', ['ngResource']).factory('resource', func
     return ExistingResourceState;
 
   })();
-  NewResourceState = (function(_super) {
-    __extends(NewResourceState, _super);
+  NewResourceState = (function(superClass) {
+    extend(NewResourceState, superClass);
 
     function NewResourceState() {
       this._state = new DirtyState();
@@ -175,20 +175,20 @@ rw = angular.module('resource.watcher', ['ngResource']).factory('resource', func
     api = $resource(url, defaultParams, defaultActions);
     Resource = (function() {
       function Resource(object) {
-        this.toDto = __bind(this.toDto, this);
-        this.sendDelete = __bind(this.sendDelete, this);
-        this.sendPut = __bind(this.sendPut, this);
-        this.sendPost = __bind(this.sendPost, this);
-        this.updateValuesWith = __bind(this.updateValuesWith, this);
-        this.setValuesWith = __bind(this.setValuesWith, this);
-        this.rollback = __bind(this.rollback, this);
-        this.isDirty = __bind(this.isDirty, this);
-        this.setAsPristine = __bind(this.setAsPristine, this);
-        this.setAsDirty = __bind(this.setAsDirty, this);
-        this.isNew = __bind(this.isNew, this);
-        this.setAsExisting = __bind(this.setAsExisting, this);
-        this["delete"] = __bind(this["delete"], this);
-        this.save = __bind(this.save, this);
+        this.toDto = bind(this.toDto, this);
+        this.sendDelete = bind(this.sendDelete, this);
+        this.sendPut = bind(this.sendPut, this);
+        this.sendPost = bind(this.sendPost, this);
+        this.updateValuesWith = bind(this.updateValuesWith, this);
+        this.setValuesWith = bind(this.setValuesWith, this);
+        this.rollback = bind(this.rollback, this);
+        this.isDirty = bind(this.isDirty, this);
+        this.setAsPristine = bind(this.setAsPristine, this);
+        this.setAsDirty = bind(this.setAsDirty, this);
+        this.isNew = bind(this.isNew, this);
+        this.setAsExisting = bind(this.setAsExisting, this);
+        this["delete"] = bind(this["delete"], this);
+        this.save = bind(this.save, this);
         this._state = this._isExisting(object) ? new ExistingResourceState() : new NewResourceState();
         this.setValuesWith(new api(object));
       }
@@ -287,30 +287,30 @@ rw = angular.module('resource.watcher', ['ngResource']).factory('resource', func
 });
 
 'use strict';
-var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+var bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
 rw.factory('CollectionWatcher', function(ResourceWatcher, $q) {
   var CollectionWatcher;
   return CollectionWatcher = (function() {
-    function CollectionWatcher(scope, collection, options) {
+    function CollectionWatcher(scope, collection1, options) {
       this.scope = scope;
-      this.collection = collection;
-      this._getOrCreateResourceWatcher = __bind(this._getOrCreateResourceWatcher, this);
-      this._watchResource = __bind(this._watchResource, this);
-      this._saveResource = __bind(this._saveResource, this);
-      this._rollbackCollection = __bind(this._rollbackCollection, this);
-      this._rollbackResources = __bind(this._rollbackResources, this);
-      this._createResourceWatcher = __bind(this._createResourceWatcher, this);
-      this.createAndAddResourceWatcher = __bind(this.createAndAddResourceWatcher, this);
-      this.setAsDirty = __bind(this.setAsDirty, this);
-      this.watchCollection = __bind(this.watchCollection, this);
-      this.watch = __bind(this.watch, this);
-      this.isNew = __bind(this.isNew, this);
-      this.isDirty = __bind(this.isDirty, this);
-      this._deleteIfNecessary = __bind(this._deleteIfNecessary, this);
-      this.save = __bind(this.save, this);
-      this._removeNewElements = __bind(this._removeNewElements, this);
-      this.cancel = __bind(this.cancel, this);
+      this.collection = collection1;
+      this._getOrCreateResourceWatcher = bind(this._getOrCreateResourceWatcher, this);
+      this._watchResource = bind(this._watchResource, this);
+      this._saveResource = bind(this._saveResource, this);
+      this._rollbackCollection = bind(this._rollbackCollection, this);
+      this._rollbackResources = bind(this._rollbackResources, this);
+      this._createResourceWatcher = bind(this._createResourceWatcher, this);
+      this.createAndAddResourceWatcher = bind(this.createAndAddResourceWatcher, this);
+      this.setAsDirty = bind(this.setAsDirty, this);
+      this.watchCollection = bind(this.watchCollection, this);
+      this.watch = bind(this.watch, this);
+      this.isNew = bind(this.isNew, this);
+      this.isDirty = bind(this.isDirty, this);
+      this._deleteIfNecessary = bind(this._deleteIfNecessary, this);
+      this.save = bind(this.save, this);
+      this._removeNewElements = bind(this._removeNewElements, this);
+      this.cancel = bind(this.cancel, this);
       this.resourceWatchers = this.collection.map((function(_this) {
         return function(it) {
           return _this._createResourceWatcher(it, options);
@@ -334,13 +334,29 @@ rw.factory('CollectionWatcher', function(ResourceWatcher, $q) {
       })(this));
     };
 
-    CollectionWatcher.prototype.save = function(options) {
-      var savePromises;
+    CollectionWatcher.prototype.save = function(options, arg) {
+      var ref, savePromises, strict;
+      strict = (ref = (arg != null ? arg : {}).strict) != null ? ref : true;
       this.watchCollection();
       this._deleteIfNecessary();
       savePromises = this.collection.map((function(_this) {
         return function(it) {
-          return _this._saveResource(options, it)["catch"](function() {});
+          var $save;
+          $save = _this._saveResource(options, it);
+          if (strict) {
+            return $save;
+          }
+          return $save.then(function(result) {
+            return {
+              success: true,
+              result: result
+            };
+          })["catch"](function(error) {
+            return {
+              success: false,
+              error: error
+            };
+          });
         };
       })(this));
       this.hasChanges = false;
@@ -461,21 +477,21 @@ rw.factory('CollectionWatcher', function(ResourceWatcher, $q) {
 });
 
 'use strict';
-var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+var bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
 rw.factory('ResourceWatcher', function() {
   var ResourceWatcher;
   return ResourceWatcher = (function() {
-    function ResourceWatcher(scope, watchedResource, _arg) {
+    function ResourceWatcher(scope, watchedResource, arg) {
       var autoWatch;
       this.scope = scope;
       this.watchedResource = watchedResource;
-      autoWatch = (_arg != null ? _arg : {}).autoWatch;
-      this.isNew = __bind(this.isNew, this);
-      this.isDirty = __bind(this.isDirty, this);
-      this.save = __bind(this.save, this);
-      this.cancel = __bind(this.cancel, this);
-      this.watch = __bind(this.watch, this);
+      autoWatch = (arg != null ? arg : {}).autoWatch;
+      this.isNew = bind(this.isNew, this);
+      this.isDirty = bind(this.isDirty, this);
+      this.save = bind(this.save, this);
+      this.cancel = bind(this.cancel, this);
+      this.watch = bind(this.watch, this);
       if (autoWatch == null) {
         autoWatch = true;
       }
